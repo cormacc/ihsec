@@ -1,12 +1,21 @@
 #!/bin/bash
 
-CONFIGS_DIR=$HOME'/.ihsec/'
+if [[-z $XDG_CONFIG_HOME]]; then
+  CONFIGS_DIR=$HOME'/.ihsec/'
+  EMACSDIR=$HOME'/.emacs.d'
+else
+  CONFIGS_DIR=$XDG_CONFIG_HOME'/ihsec/'
+  EMACSDIR=$XDG_CONFIG_HOME'/emacs'
+fi
+
+
 # Uncomment to use this script from the same folder as emacs configs
 #CONFIGS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo " Configuration directory: "$CONFIGS_DIR
+echo " Emacs directory: "$EMACSDIR
+
 CONFIGDIRS="$CONFIGS_DIR/*/"
-EMACSDIR=$HOME'/.emacs.d'
 
 function displayHelp
 {
@@ -17,7 +26,7 @@ function displayHelp
 
 function displayError
 {
-    echo -e " Something went wrong!\n Ensure ~/.emacs.d is a symlink or does not exist!"; exit $?
+    echo -e " Something went wrong!\n Ensure $EMACSDIR is a symlink or does not exist!"; exit $?
 }
 
 function displayArgError
@@ -30,7 +39,7 @@ if [ "$#" -eq 0 ]; then displayHelp; fi
 case "$1" in
     list)
 	if [ ! "$#" -eq 1 ]; then displayArgError; fi
-	CURR_CONFIG=$(basename $(readlink -f $HOME/.emacs.d/))
+	CURR_CONFIG=$(basename $(readlink -f $EMACSDIR/))
 	echo -e " Available configurations:"
 	for DIR in $CONFIGDIRS; do
 	    if [[ -d $DIR ]]; then
